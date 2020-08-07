@@ -12,17 +12,18 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 public class CountryController {
     @Autowired
     CountryRepository countryrepos;
 
-    private List<Country> findCountries(List<Country> myList, CheckCountry tester){
+    private List<Country> findCountries(List<Country> countryList, CheckCountry tester){
         List<Country> tempList = new ArrayList<>();
 
-        for(Country c : myList){
-            if(tester.test(c));{
+        for(Country c : countryList){
+            if(tester.test(c)){
                 tempList.add(c);
             }
         }
@@ -44,9 +45,11 @@ public class CountryController {
     public ResponseEntity<?> countriesByFirstLetter(@PathVariable char letter){
         List<Country> countryList = new ArrayList<>();
         countryrepos.findAll().iterator().forEachRemaining(countryList::add);
-        List<Country> rtnList = findCountries(countryList, c -> c.getName().charAt(0) == letter);
+        List<Country> rtnList = findCountries(countryList, c -> c.getName().toLowerCase().charAt(0) == letter);
+        rtnList.sort((c1, c2) -> c1.getName().compareToIgnoreCase(c2.getName()));
 
-        System.out.println("Name starting with " + letter );
+//        System.out.println(rtnList);
+//        System.out.println("Name starting with " + letter );
         return new ResponseEntity<>(rtnList, HttpStatus.OK);
     }
 
